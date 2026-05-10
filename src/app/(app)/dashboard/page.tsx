@@ -44,8 +44,8 @@ export default async function DashboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: trips.length === 1 ? "1fr" : "1fr 0.55fr", gap: 16, marginBottom: 28 }}>
           {trips.slice(0, 2).map((trip, idx) => (
             <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: "none" }}>
-              <div style={{ borderRadius: 16, overflow: "hidden", position: "relative", height: idx === 0 ? 280 : 200, background: "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }} />
+              <div style={{ borderRadius: 16, overflow: "hidden", position: "relative", height: idx === 0 ? 280 : 200, background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover no-repeat` : "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }} />
                 <div style={{ position: "relative", zIndex: 2, padding: "14px 16px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
                   <div>
                     <div style={{ display: "inline-block", background: "rgba(0,0,0,0.45)", color: "#fff", fontSize: 11, fontWeight: 600, borderRadius: 9999, padding: "4px 10px", marginBottom: 6 }}>

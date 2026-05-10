@@ -51,8 +51,8 @@ export default async function MyTripsPage() {
             return (
               <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: "none" }}>
                 <div style={{ display: "flex", alignItems: "stretch", background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", overflow: "hidden", transition: "box-shadow 0.2s, transform 0.2s", cursor: "pointer" }} className="trip-list-card">
-                  <div style={{ width: 180, minHeight: 140, background: "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <MapPin size={28} style={{ opacity: 0.2, color: "#fff" }} />
+                  <div style={{ width: 180, minHeight: 140, background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover no-repeat` : "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {!trip.cover_photo_url && <MapPin size={28} style={{ opacity: 0.2, color: "#fff" }} />}
                   </div>
                   <div style={{ flex: 1, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
