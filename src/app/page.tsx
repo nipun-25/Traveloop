@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ChevronLeft, ChevronRight, Bookmark, ArrowRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Bookmark, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { login, signup } from './(auth)/actions';
+import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 const DESTINATIONS = [
   {
@@ -47,6 +49,19 @@ export default function LandingPage({ initialAuthType = null }: LandingPageProps
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [user, setUser] = useState<{ name?: string } | null>(null);
+
+  useEffect(() => {
+    async function checkUser() {
+      const supabase = createClient();
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        // Try to get name from profile or metadata
+        setUser({ name: authUser.user_metadata?.name || authUser.email?.split('@')[0] });
+      }
+    }
+    checkUser();
+  }, []);
 
   const nextSlide = () => {
     setDirection(1);
@@ -139,19 +154,28 @@ export default function LandingPage({ initialAuthType = null }: LandingPageProps
           <button className="search-btn glass">
             <Search size={18} />
           </button>
-          <button
-            className="login-nav-btn glass"
-            onClick={() => {
-              setAuthType(authType ? null : 'login');
-              setError(null);
-              setSignupSuccess(false);
-            }}
-          >
-            {authType ? 'Explore' : 'Login'}
-          </button>
-          <div className="greeting">
-            Hello, <span>Anney!</span>
-          </div>
+          {user ? (
+            <Link href="/dashboard" className="login-nav-btn glass" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+              <LayoutDashboard size={18} /> Dashboard
+            </Link>
+          ) : (
+            <button
+              className="login-nav-btn glass"
+              onClick={() => {
+                setAuthType(authType ? null : 'login');
+                setError(null);
+                setSignupSuccess(false);
+              }}
+            >
+              {authType ? 'Explore' : 'Login'}
+            </button>
+          )}
+          
+          {user && (
+            <div className="greeting">
+              Hello, <span>{user.name}!</span>
+            </div>
+          )}
         </div>
       </nav>
 
