@@ -17,7 +17,7 @@
 - **Styling**: Vanilla CSS (Custom Luxe Theme), Lucide Icons
 - **Backend**: Supabase (Authentication & PostgreSQL)
 - **Database**: PostgreSQL with Row-Level Security (RLS)
-- **Deployment**: Vercel
+- **Deployment**: [Vercel (Live Preview)](https://traveloop-black.vercel.app)
 
 ## 🚀 Getting Started
 
