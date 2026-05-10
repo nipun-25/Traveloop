@@ -78,9 +78,5 @@ Traveloop/
 - 📱 **PWA Support**: Offline access for travelers on the go.
 - 🤖 **AI Suggestions**: Smart itinerary generation based on user preferences.
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ---
 *Developed as a professional travel management solution.*
