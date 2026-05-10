@@ -69,7 +69,8 @@ Traveloop/
 ```
 
 ## 📸 Screenshots
-*(Add high-quality screenshots here to showcase the premium UI)*
+<img width="1904" height="947" alt="image" src="https://github.com/user-attachments/assets/50c7e746-bb00-42a4-b386-63bd69b1f0d3" />
+
 
 ## 🔮 Future Scope
 
