@@ -2,17 +2,17 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Check, Plus, Trash2, RotateCcw, Shirt, FileText, Smartphone, Briefcase, Package } from 'lucide-react';
+import { ArrowLeft, Check, Plus, Trash2, Shirt, FileText, Smartphone, Briefcase, Package, ChevronDown } from 'lucide-react';
 import { addPackingItem, togglePackingItem, removePackingItem } from './actions';
 import type { PackingItem } from '@/types';
 
 const CATEGORIES = [
-  { name: "Clothing", icon: <Shirt size={15} />, color: "#5b8a68" },
-  { name: "Documents", icon: <FileText size={15} />, color: "#d97706" },
-  { name: "Electronics", icon: <Smartphone size={15} />, color: "#5b4db5" },
-  { name: "Toiletries", icon: <Package size={15} />, color: "#e56040" },
-  { name: "Medicine", icon: <Briefcase size={15} />, color: "#c44" },
-  { name: "Other", icon: <Briefcase size={15} />, color: "#888" },
+  { name: "Clothing", icon: <Shirt size={16} />, color: "var(--primary)" },
+  { name: "Documents", icon: <FileText size={16} />, color: "var(--gold)" },
+  { name: "Electronics", icon: <Smartphone size={16} />, color: "var(--accent-light)" },
+  { name: "Toiletries", icon: <Package size={16} />, color: "#10b981" },
+  { name: "Medicine", icon: <Briefcase size={16} />, color: "#ef4444" },
+  { name: "Other", icon: <Briefcase size={16} />, color: "var(--text-muted)" },
 ];
 
 export default function PackingListClient({ tripId, initialItems }: { tripId: string; initialItems: PackingItem[] }) {
@@ -51,60 +51,200 @@ export default function PackingListClient({ tripId, initialItems }: { tripId: st
   })).filter(cat => cat.items.length > 0);
 
   return (
-    <div>
-      <Link href={`/trips/${tripId}`} style={{ display: "flex", alignItems: "center", gap: 6, color: "#888", fontSize: 13, fontWeight: 500, textDecoration: "none", marginBottom: 28 }}>
-        <ArrowLeft size={15} /> Back to Trip
-      </Link>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32, fontFamily: "'Montserrat', sans-serif" }}>
+      <header>
+        <Link href={`/trips/${tripId}`} style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 8, 
+          color: "var(--text-muted)", 
+          fontSize: 13, 
+          fontWeight: 700, 
+          textDecoration: "none", 
+          marginBottom: 16,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          <ArrowLeft size={16} /> Back to Trip
+        </Link>
+        <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>Packing Checklist</h1>
+        <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Keep track of everything you need for your journey.</p>
+      </header>
 
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>Packing Checklist</h1>
-          <p style={{ fontSize: 14, color: "#888" }}>Keep track of everything you need.</p>
+      {/* Progress Bar */}
+      <div className="glass-panel" style={{ padding: "24px 32px", borderRadius: 24, display: "flex", alignItems: "center", gap: 24, border: '1px solid var(--outline-variant)' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "white", whiteSpace: "nowrap" }}>{packedCount} of {items.length} items</div>
+        <div style={{ flex: 1, height: 10, background: "rgba(255,255,255,0.05)", borderRadius: 10, overflow: "hidden" }}>
+          <div style={{ 
+            height: "100%", 
+            width: `${pct}%`, 
+            background: pct === 100 ? "#10b981" : "linear-gradient(90deg, var(--primary), var(--accent-light))", 
+            borderRadius: 10, 
+            transition: "width 0.6s cubic-bezier(0.4, 0, 0.2, 1)" 
+          }} />
         </div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: pct === 100 ? "#10b981" : "var(--primary)", minWidth: 50, textAlign: "right" }}>{pct}%</div>
       </div>
 
-      {/* Progress */}
-      <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", padding: "20px 24px", marginBottom: 28, display: "flex", alignItems: "center", gap: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", whiteSpace: "nowrap" }}>{packedCount} of {items.length} packed</div>
-        <div style={{ flex: 1, height: 8, background: "#ede9e3", borderRadius: 9999, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${pct}%`, background: pct === 100 ? "#2d4a35" : "#5b8a68", borderRadius: 9999, transition: "width 0.4s" }} />
+      {/* Add Item Form */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+        <input 
+          style={{ 
+            flex: "1 1 300px", 
+            padding: "16px 20px", 
+            borderRadius: 16, 
+            border: "1px solid var(--outline-variant)", 
+            background: "rgba(255,255,255,0.03)", 
+            fontSize: 15, 
+            color: "white", 
+            outline: "none",
+            fontWeight: 500,
+            transition: 'all 0.3s'
+          }} 
+          placeholder="What do you need to pack?" 
+          value={newItem} 
+          onChange={e => setNewItem(e.target.value)} 
+          onKeyDown={e => e.key === "Enter" && handleAdd()} 
+          onFocus={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+          onBlur={e => e.currentTarget.style.borderColor = 'var(--outline-variant)'}
+        />
+        <div style={{ position: 'relative', flex: "0 0 200px" }}>
+          <select 
+            style={{ 
+              width: "100%",
+              padding: "16px 20px", 
+              borderRadius: 16, 
+              border: "1px solid var(--outline-variant)", 
+              background: "rgba(255,255,255,0.03)", 
+              fontSize: 15, 
+              color: "white", 
+              outline: "none",
+              fontWeight: 600,
+              appearance: 'none',
+              cursor: 'pointer'
+            }} 
+            value={newCat} 
+            onChange={e => setNewCat(e.target.value)}
+          >
+            {CATEGORIES.map(c => <option key={c.name}>{c.name}</option>)}
+          </select>
+          <ChevronDown size={18} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
         </div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: "#2d4a35", minWidth: 44, textAlign: "right" }}>{pct}%</div>
-      </div>
-
-      {/* Add Item */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 28 }}>
-        <input style={{ flex: 1, padding: "10px 16px", borderRadius: 12, border: "1px solid #e2ddd6", background: "#faf9f7", fontSize: 13, color: "#1a1a1a", outline: "none" }} placeholder="Add a new item…" value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === "Enter" && handleAdd()} />
-        <select style={{ padding: "10px 14px", borderRadius: 12, border: "1px solid #e2ddd6", background: "#faf9f7", fontSize: 13, color: "#1a1a1a", outline: "none" }} value={newCat} onChange={e => setNewCat(e.target.value)}>
-          {CATEGORIES.map(c => <option key={c.name}>{c.name}</option>)}
-        </select>
-        <button style={{ display: "flex", alignItems: "center", gap: 8, background: "#2d4a35", color: "#fff", border: "none", borderRadius: 9999, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: "pointer" }} onClick={handleAdd}><Plus size={16} /> Add</button>
+        <button 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 10, 
+            background: "var(--primary)", 
+            color: "white", 
+            border: "none", 
+            borderRadius: 16, 
+            padding: "16px 32px", 
+            fontSize: 15, 
+            fontWeight: 800, 
+            cursor: "pointer",
+            transition: 'all 0.3s',
+            boxShadow: '0 8px 24px rgba(26, 111, 205, 0.2)'
+          }} 
+          onClick={handleAdd}
+        >
+          <Plus size={20} /> Add
+        </button>
       </div>
 
       {items.length === 0 && (
-        <div style={{ background: "#fff", borderRadius: 16, border: "2px dashed #ddd8d0", padding: "40px", textAlign: "center", color: "#888", fontSize: 14 }}>
-          No packing items yet. Add items above to get started!
+        <div className="glass-panel" style={{ padding: 64, borderRadius: 32, textAlign: "center", border: "1px dashed var(--outline-variant)" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 16, fontWeight: 500 }}>
+            Your packing list is empty. Add your first item above!
+          </p>
         </div>
       )}
 
-      {groupedByCategory.map((cat) => (
-        <div key={cat.name} style={{ marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: cat.color + "18", color: cat.color, display: "flex", alignItems: "center", justifyContent: "center" }}>{cat.icon}</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#1a1a1a" }}>{cat.name}</div>
-            <div style={{ fontSize: 11, color: "#999", marginLeft: "auto" }}>{cat.items.filter(i => i.is_packed).length}/{cat.items.length}</div>
-          </div>
-          {cat.items.map((item) => (
-            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 12, background: "#fff", border: "1px solid #f0ede8", marginBottom: 6 }}>
-              <div onClick={() => handleToggle(item)} style={{ width: 22, height: 22, borderRadius: 7, border: item.is_packed ? "none" : "2px solid #d8d4ce", background: item.is_packed ? "#2d4a35" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
-                {item.is_packed && <Check size={14} color="#fff" />}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 32 }}>
+        {groupedByCategory.map((cat) => (
+          <div key={cat.name} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "0 8px" }}>
+              <div style={{ 
+                width: 36, 
+                height: 36, 
+                borderRadius: 10, 
+                background: cat.color + "20", 
+                color: cat.color, 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
+                border: `1px solid ${cat.color}40`
+              }}>
+                {cat.icon}
               </div>
-              <div style={{ fontSize: 14, color: item.is_packed ? "#aaa" : "#1a1a1a", textDecoration: item.is_packed ? "line-through" : "none", flex: 1 }}>{item.item_name}</div>
-              <button onClick={() => handleRemove(item.id)} style={{ border: "none", background: "none", color: "#ccc", cursor: "pointer", padding: 4 }}><Trash2 size={14} /></button>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "white", letterSpacing: '-0.01em' }}>{cat.name}</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: "auto", fontWeight: 700 }}>
+                {cat.items.filter(i => i.is_packed).length} / {cat.items.length}
+              </div>
             </div>
-          ))}
-        </div>
-      ))}
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {cat.items.map((item) => (
+                <div key={item.id} style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 16, 
+                  padding: "16px 20px", 
+                  borderRadius: 20, 
+                  background: item.is_packed ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)", 
+                  border: item.is_packed ? "1px solid transparent" : "1px solid var(--outline-variant)", 
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  opacity: item.is_packed ? 0.6 : 1
+                }}>
+                  <div 
+                    onClick={() => handleToggle(item)} 
+                    style={{ 
+                      width: 26, 
+                      height: 26, 
+                      borderRadius: 8, 
+                      border: item.is_packed ? "none" : "2px solid var(--outline)", 
+                      background: item.is_packed ? "#10b981" : "transparent", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center", 
+                      cursor: "pointer", 
+                      flexShrink: 0,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {item.is_packed && <Check size={16} color="#fff" strokeWidth={3} />}
+                  </div>
+                  <div style={{ 
+                    fontSize: 15, 
+                    color: "white", 
+                    textDecoration: item.is_packed ? "line-through" : "none", 
+                    flex: 1,
+                    fontWeight: item.is_packed ? 500 : 600,
+                    transition: 'all 0.3s'
+                  }}>
+                    {item.item_name}
+                  </div>
+                  <button 
+                    onClick={() => handleRemove(item.id)} 
+                    style={{ 
+                      border: "none", 
+                      background: "none", 
+                      color: "rgba(255,255,255,0.2)", 
+                      cursor: "pointer", 
+                      padding: 8,
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseOver={e => e.currentTarget.style.color = '#ef4444'}
+                    onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.2)'}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

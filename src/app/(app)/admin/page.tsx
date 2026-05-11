@@ -1,38 +1,17 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { getAdminAnalytics } from './actions';
-import { Users, MapPin, TrendingUp, BarChart3, Globe, Activity, ArrowUp, ArrowDown } from 'lucide-react';
-
-const S = {
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 },
-  subtitle: { fontSize: 14, color: "#888", marginBottom: 32 },
-  statsGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 },
-  statCard: { background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", padding: "22px 24px" },
-  statTop: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },
-  statIcon: { width: 40, height: 40, borderRadius: 12, background: "#dce8dc", color: "#2d4a35", display: "flex", alignItems: "center", justifyContent: "center" },
-  statChange: (up: boolean) => ({ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: up ? "#2d4a35" : "#e56040" }),
-  statValue: { fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 800, color: "#1a1a1a", marginBottom: 2 },
-  statLabel: { fontSize: 11, color: "#888" },
-  mainGrid: { display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 16, marginBottom: 28 },
-  card: { background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", padding: "24px" },
-  cardTitle: { fontSize: 15, fontWeight: 700, color: "#1a1a1a", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 },
-  cityRow: { display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid #f5f3ef" },
-  cityRank: { width: 24, height: 24, borderRadius: 7, background: "#f0ede8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#888", flexShrink: 0 },
-  cityName: { fontSize: 14, fontWeight: 600, color: "#1a1a1a", flex: 1 },
-  cityTrips: { fontSize: 12, color: "#888", minWidth: 60, textAlign: "right" as const },
-  cityBar: { width: 80, height: 6, background: "#ede9e3", borderRadius: 9999, overflow: "hidden" as const },
-  cityFill: (pct: number) => ({ height: "100%", width: `${pct}%`, background: "#2d4a35", borderRadius: 9999 }),
-  actRow: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #f5f3ef" },
-  actName: { fontSize: 14, fontWeight: 600, color: "#1a1a1a" },
-  actCount: { fontSize: 13, fontWeight: 700, color: "#2d4a35" },
-  table: { width: "100%", borderCollapse: "collapse" as const },
-  th: { textAlign: "left" as const, fontSize: 10, fontWeight: 700, color: "#aaa", letterSpacing: "0.1em", textTransform: "uppercase" as const, padding: "10px 14px", borderBottom: "1px solid #e8e4de" },
-  td: { padding: "12px 14px", fontSize: 14, color: "#555", borderBottom: "1px solid #f5f3ef" },
-  tdName: { fontWeight: 600, color: "#1a1a1a" },
-  badge: { display: "inline-block", fontSize: 11, fontWeight: 600, borderRadius: 9999, padding: "3px 10px", background: "#dce8dc", color: "#2d4a35" },
-};
-
-const ICONS = [<Users key="u" size={18}/>, <MapPin key="m" size={18}/>, <Activity key="a" size={18}/>, <TrendingUp key="t" size={18}/>];
+import { 
+  Users, 
+  Map, 
+  Activity, 
+  TrendingUp, 
+  TrendingDown, 
+  Globe, 
+  Zap, 
+  Search,
+  BarChart3
+} from 'lucide-react';
 
 export default async function AdminPage() {
   const data = await getAdminAnalytics();
@@ -41,76 +20,129 @@ export default async function AdminPage() {
     notFound();
   }
 
+  const STAT_ICONS = [Users, Map, Activity, TrendingUp];
+  const STAT_COLORS = ["var(--primary)", "var(--accent-light)", "var(--gold)", "#10b981"];
+
   return (
-    <div>
-      <h1 style={S.title}>Analytics Dashboard</h1>
-      <p style={S.subtitle}>Monitor platform usage, popular destinations, and user engagement.</p>
+    <div style={{ display: "flex", flexDirection: "column", gap: 40, fontFamily: "'Montserrat', sans-serif" }}>
+      <header>
+        <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>Analytics Dashboard</h1>
+        <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Monitor platform usage, popular destinations, and user engagement.</p>
+      </header>
 
-      {/* Stats */}
-      <div style={S.statsGrid}>
-        {data.stats.map((stat, i) => (
-          <div key={stat.label} style={S.statCard}>
-            <div style={S.statTop}>
-              <div style={S.statIcon}>{ICONS[i]}</div>
-              <div style={S.statChange(stat.up)}>
-                {stat.up ? <ArrowUp size={13} /> : <ArrowDown size={13} />}
-                {stat.change}
+      {/* Stats Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+        {data.stats.map((stat, i) => {
+          const Icon = STAT_ICONS[i];
+          return (
+            <div key={stat.label} className="glass-panel" style={{ padding: 28, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: 'rgba(255,255,255,0.03)',
+                  color: STAT_COLORS[i],
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: '1px solid rgba(255,255,255,0.05)'
+                }}>
+                  <Icon size={22} />
+                </div>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  fontSize: 12, fontWeight: 700,
+                  color: stat.up ? '#10b981' : 'var(--error)'
+                }}>
+                  {stat.up ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                  {stat.change}
+                </div>
               </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: 'white', marginBottom: 6, letterSpacing: '-0.02em' }}>{stat.value}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
             </div>
-            <div style={S.statValue}>{stat.value}</div>
-            <div style={S.statLabel}>{stat.label}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Cities & Activities */}
-      <div style={S.mainGrid}>
-        <div style={S.card}>
-          <div style={S.cardTitle}><Globe size={16} /> Top Cities</div>
-          {data.topCities.map((city) => (
-            <div key={city.name} style={S.cityRow}>
-              <div style={S.cityRank}>{city.rank}</div>
-              <div style={S.cityName}>{city.name}</div>
-              <div style={S.cityTrips}>{city.trips.toLocaleString()}</div>
-              <div style={S.cityBar}><div style={S.cityFill(city.pct)} /></div>
-            </div>
-          ))}
-          {data.topCities.length === 0 && <p style={{ fontSize: 13, color: "#888", textAlign: "center", padding: 20 }}>No destination data yet.</p>}
-        </div>
-        <div style={S.card}>
-          <div style={S.cardTitle}><BarChart3 size={16} /> Popular Activities</div>
-          {data.topActivities.map((act) => (
-            <div key={act.name} style={S.actRow}>
-              <div style={S.actName}>{act.name}</div>
-              <div style={S.actCount}>{act.count.toLocaleString()}</div>
-            </div>
-          ))}
-          {data.topActivities.length === 0 && <p style={{ fontSize: 13, color: "#888", textAlign: "center", padding: 20 }}>No activity data yet.</p>}
-        </div>
-      </div>
-
-      {/* User Table */}
-      <div style={S.card}>
-        <div style={S.cardTitle}><Users size={16} /> Recent Users</div>
-        <table style={S.table}>
-          <thead>
-            <tr>
-              <th style={S.th}>Name</th>
-              <th style={S.th}>Email</th>
-              <th style={S.th}>Joined</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.recentUsers.map((user) => (
-              <tr key={user.email}>
-                <td style={{ ...S.td, ...S.tdName }}>{user.name}</td>
-                <td style={S.td}>{user.email}</td>
-                <td style={S.td}>{user.joined}</td>
-              </tr>
+      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 24 }}>
+        {/* Top Cities */}
+        <div className="glass-panel" style={{ padding: 32, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+            <Globe size={18} color="var(--accent-light)" />
+            Top Travel Destinations
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {data.topCities.map((city) => (
+              <div key={city.name} style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                <div style={{ width: 32, fontSize: 13, fontWeight: 800, color: 'var(--text-muted)', opacity: 0.3 }}>{city.rank.toString().padStart(2, '0')}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <span style={{ fontWeight: 700, color: 'white', fontSize: 15 }}>{city.name}</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>{city.trips.toLocaleString()} trips</span>
+                  </div>
+                  <div style={{ height: 6, background: 'rgba(255,255,255,0.05)', borderRadius: 10, overflow: 'hidden' }}>
+                    <div style={{ 
+                      height: '100%', 
+                      width: `${city.pct}%`, 
+                      background: 'linear-gradient(90deg, var(--primary), var(--accent-light))', 
+                      borderRadius: 10 
+                    }} />
+                  </div>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
+
+        {/* Popular Activities */}
+        <div className="glass-panel" style={{ padding: 32, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+            <Zap size={18} color="var(--gold)" />
+            Trending Activities
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {data.topActivities.map((act) => (
+              <div key={act.name} style={{
+                padding: '16px 20px', borderRadius: 16,
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.03)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                transition: 'all 0.3s'
+              }}>
+                <span style={{ fontWeight: 600, color: 'white', fontSize: 14 }}>{act.name}</span>
+                <span className="pill-confirmed" style={{ fontSize: 11 }}>{act.count.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="glass-panel" style={{ padding: 32, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+          <Search size={18} color="var(--primary)" />
+          Recent Explorers
+        </h3>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--outline-variant)' }}>
+                <th style={{ textAlign: 'left', padding: '16px', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Member</th>
+                <th style={{ textAlign: 'left', padding: '16px', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Contact</th>
+                <th style={{ textAlign: 'left', padding: '16px', color: 'var(--text-muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.recentUsers.map((user) => (
+                <tr key={user.email} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.3s' }}>
+                  <td style={{ padding: '20px 16px', fontWeight: 700, color: 'white', fontSize: 14 }}>{user.name}</td>
+                  <td style={{ padding: '20px 16px', color: 'var(--text-muted)', fontSize: 14, fontWeight: 500 }}>{user.email}</td>
+                  <td style={{ padding: '20px 16px', color: 'var(--text-muted)', fontSize: 13, fontWeight: 600 }}>{user.joined}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+

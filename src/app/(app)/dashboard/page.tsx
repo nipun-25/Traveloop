@@ -1,72 +1,173 @@
 import React from 'react';
 import Link from 'next/link';
 import { getTrips } from '../trips/actions';
-import { Plus, MapPin, ArrowRight, Calendar, Plane } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { 
+  PlusCircle, 
+  Map, 
+  User, 
+  Settings, 
+  HelpCircle, 
+  Compass, 
+  Star, 
+  Briefcase, 
+  CheckCircle2 
+} from 'lucide-react';
 
 export default async function DashboardPage() {
   const trips = await getTrips();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Traveler';
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  const daysUntil = (d: string) => {
-    const diff = Math.ceil((new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? `${diff} days until departure` : diff === 0 ? "Departing today!" : "Trip completed";
-  };
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  
+  const upcomingTrips = trips.filter(t => new Date(t.start_date) >= new Date()).slice(0, 3);
+  const pastTripsCount = trips.filter(t => new Date(t.end_date) < new Date()).length;
 
   return (
-    <div>
-      {/* Welcome Row */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
+      
+      {/* Welcome Section */}
+      <section
+        className="glass-panel"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderRadius: 32,
+          padding: 40,
+          background: "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))",
+          border: "1px solid var(--outline-variant)",
+          flexWrap: "wrap",
+          gap: 24,
+        }}
+      >
         <div>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>Welcome back 👋</h1>
-          <p style={{ fontSize: 14, color: "#888" }}>Your next extraordinary journey awaits.</p>
+          <h1 style={{ fontSize: 36, color: "white", marginBottom: 12, letterSpacing: "-0.03em" }}>Welcome back, {userName}</h1>
+          <p style={{ fontSize: 16, color: "var(--text-muted)", fontWeight: 500 }}>Here is your travel overview and upcoming plans.</p>
         </div>
-        <Link href="/trips/create-trip" style={{ display: "flex", alignItems: "center", gap: 8, background: "#2d4a35", color: "#fff", border: "none", borderRadius: 9999, padding: "12px 22px", fontSize: 13, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
-          <Plus size={16} /> Plan New Trip
+        <Link
+          href="/trips/create-trip"
+          style={{
+            padding: "16px 32px",
+            background: "var(--primary)",
+            color: "white",
+            borderRadius: 16,
+            fontWeight: 700,
+            fontSize: 16,
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            boxShadow: "0 10px 25px rgba(26, 111, 205, 0.3)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            textDecoration: 'none'
+          }}
+        >
+          <PlusCircle size={20} />
+          <span>Plan New Trip</span>
         </Link>
-      </div>
+      </section>
 
-      {/* Trip Section */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#1a1a1a" }}>Your Trips</div>
-        <Link href="/trips" style={{ fontSize: 12, color: "#888", textDecoration: "none" }}>View All</Link>
-      </div>
-
-      {trips.length === 0 ? (
-        <div style={{ background: "#fff", borderRadius: 20, border: "2px dashed #ddd8d0", padding: "60px 32px", textAlign: "center" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#f0ede8", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#aaa" }}><Plane size={24} /></div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>No trips yet</div>
-          <div style={{ fontSize: 14, color: "#888", marginBottom: 24 }}>Start your journey by creating your first trip.</div>
-          <Link href="/trips/create-trip" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#2d4a35", color: "#fff", borderRadius: 9999, padding: "12px 22px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-            Create your first trip →
+      {/* Upcoming Trips */}
+      <section>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+          <h2 style={{ fontSize: 24, color: "white", letterSpacing: "-0.02em" }}>Upcoming Adventures</h2>
+          <Link href="/trips" style={{ color: "var(--primary)", textDecoration: 'none', fontWeight: 700, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+            View all trips
+            <Compass size={14} />
           </Link>
         </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: trips.length === 1 ? "1fr" : "1fr 0.55fr", gap: 16, marginBottom: 28 }}>
-          {trips.slice(0, 2).map((trip, idx) => (
-            <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: "none" }}>
-              <div style={{ borderRadius: 16, overflow: "hidden", position: "relative", height: idx === 0 ? 280 : 200, background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover no-repeat` : "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }} />
-                <div style={{ position: "relative", zIndex: 2, padding: "14px 16px", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ display: "inline-block", background: "rgba(0,0,0,0.45)", color: "#fff", fontSize: 11, fontWeight: 600, borderRadius: 9999, padding: "4px 10px", marginBottom: 6 }}>
-                      {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
-                    </div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 3, fontFamily: "'Playfair Display', serif" }}>{trip.name}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", display: "flex", alignItems: "center", gap: 4 }}>
-                      <Plane size={13} /> {daysUntil(trip.start_date)}
-                    </div>
-                  </div>
-                  {idx === 0 && (
-                    <span style={{ display: "flex", alignItems: "center", gap: 6, background: "#fff", color: "#1a1a1a", borderRadius: 9999, padding: "9px 16px", fontSize: 12, fontWeight: 700 }}>
-                      View <ArrowRight size={14} />
-                    </span>
-                  )}
+
+        {upcomingTrips.length === 0 ? (
+          <div className="glass-panel" style={{ padding: "80px 40px", textAlign: 'center', borderRadius: 32, border: '1px dashed var(--outline)' }}>
+            <div style={{ color: 'var(--primary)', opacity: 0.5, marginBottom: 20 }}>
+              <Compass size={48} />
+            </div>
+            <h3 style={{ fontSize: 20, color: 'white', marginBottom: 12 }}>No upcoming trips</h3>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 28, maxWidth: 400, marginInline: 'auto' }}>Time to start planning your next getaway! Explore new destinations and create memories.</p>
+            <Link href="/trips/create-trip" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none', background: 'var(--primary-container)', padding: '12px 24px', borderRadius: 12 }}>Create a trip now</Link>
+          </div>
+        ) : (
+          <div
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 32 }}
+          >
+            {upcomingTrips.map((trip) => (
+              <Link key={trip.id} href={`/trips/${trip.id}`} className="dest-card" style={{ textDecoration: 'none' }}>
+                <img src={trip.cover_photo_url || "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80"} alt={trip.name} />
+                <div className="overlay" />
+                <div className="bookmark-btn">
+                  <Star size={20} fill="var(--gold)" color="var(--gold)" />
                 </div>
+                <div className="card-info">
+                  <div style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 800, letterSpacing: '0.05em', marginBottom: 6, textTransform: 'uppercase' }}>
+                    {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+                  </div>
+                  <h3 className="text-shadow" style={{ fontWeight: 700, fontSize: 22, color: "white" }}>
+                    {trip.name}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Stats & Actions */}
+      <div
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 32, paddingBottom: 64 }}
+      >
+        {/* Stats */}
+        <div className="glass-panel" style={{ borderRadius: 32, padding: 32, border: '1px solid var(--outline-variant)' }}>
+          <h3 style={{ fontSize: 20, color: "white", marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Briefcase size={20} color="var(--primary)" />
+            Travel Stats
+          </h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            {[
+              { label: "Total Trips", icon: Compass, color: "var(--primary)", count: trips.length },
+              { label: "Completed", icon: CheckCircle2, color: "#10b981", count: pastTripsCount },
+            ].map((stat) => (
+              <div key={stat.label} className="budget-card" style={{ background: 'rgba(255,255,255,0.02)', padding: 24 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", color: "var(--text-muted)", textTransform: "uppercase" }}>{stat.label}</span>
+                  <stat.icon size={18} color={stat.color} />
+                </div>
+                <span style={{ fontSize: 32, fontWeight: 800, color: "white" }}>{stat.count}</span>
               </div>
-            </Link>
-          ))}
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Quick Actions */}
+        <div className="glass-panel" style={{ borderRadius: 32, padding: 32, border: '1px solid var(--outline-variant)' }}>
+          <h3 style={{ fontSize: 20, color: "white", marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Compass size={20} color="var(--secondary)" />
+            Quick Actions
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {[
+              { label: 'My Profile', icon: User, href: '/profile', color: 'var(--primary)' },
+              { label: 'Explore Cities', icon: Map, href: '/trips', color: 'var(--secondary)' },
+              { label: 'Settings', icon: Settings, href: '/profile', color: 'white' },
+              { label: 'Help Center', icon: HelpCircle, href: '#', color: 'var(--text-muted)' },
+            ].map(action => (
+              <Link key={action.label} href={action.href} style={{ textDecoration: 'none' }}>
+                <div className="booking-item" style={{ padding: '14px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <action.icon size={18} color={action.color} opacity={0.8} />
+                    <span style={{ color: 'white', fontWeight: 600, fontSize: 13 }}>{action.label}</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
+

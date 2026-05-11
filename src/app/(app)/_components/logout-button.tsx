@@ -1,31 +1,50 @@
 "use client";
 
 import { logout } from "../../(auth)/actions";
-import { Button } from "@/components/ui";
+import { LogOut } from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function LogoutButton() {
+export default function LogoutButton({ showLabel = true }: { showLabel?: boolean }) {
   return (
-    <Button
-      variant="ghost"
-      size="sm"
+    <button
       onClick={() => logout()}
-      className="text-neutral-500 hover:text-error"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        padding: showLabel ? "10px 16px" : "10px 0",
+        justifyContent: showLabel ? "flex-start" : "center",
+        borderRadius: "12px",
+        fontFamily: "'Montserrat', sans-serif",
+        fontSize: "14px",
+        fontWeight: 500,
+        color: "rgba(255, 255, 255, 0.6)",
+        cursor: "pointer",
+        border: "none",
+        background: "none",
+        width: "100%",
+        textAlign: "left",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+      }}
+      className="nav-link-logout"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-4 h-4 mr-2"
-      >
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" x2="9" y1="12" y2="12" />
-      </svg>
-      Log Out
-    </Button>
+      <LogOut size={20} style={{ flexShrink: 0 }} />
+      {showLabel && (
+        <motion.span 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }}
+          style={{ whiteSpace: "nowrap" }}
+        >
+          Logout
+        </motion.span>
+      )}
+      <style>{`
+        .nav-link-logout:hover {
+          background: rgba(245, 166, 35, 0.1) !important;
+          color: var(--secondary) !important;
+        }
+      `}</style>
+    </button>
   );
 }
+

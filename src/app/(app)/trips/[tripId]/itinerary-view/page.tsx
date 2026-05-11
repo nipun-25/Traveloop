@@ -2,7 +2,16 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, MapPin, Clock, DollarSign, List, CalendarDays } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  List, 
+  Calendar, 
+  MapPin, 
+  Clock, 
+  CreditCard,
+  ChevronRight,
+  Compass
+} from 'lucide-react';
 
 const ITINERARY = [
   {
@@ -45,73 +54,102 @@ const ITINERARY = [
   }
 ];
 
-const S = {
-  backLink: { display: "flex", alignItems: "center", gap: 6, color: "#888", fontSize: 13, fontWeight: 500, textDecoration: "none", marginBottom: 28 },
-  header: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 },
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 },
-  subtitle: { fontSize: 14, color: "#888" },
-  toggleRow: { display: "flex", gap: 8 },
-  toggleBtn: (active: boolean) => ({ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 9999, border: active ? "none" : "1px solid #d8d4ce", background: active ? "#2d4a35" : "transparent", color: active ? "#fff" : "#888", fontSize: 12, fontWeight: 600, cursor: "pointer" }),
-  cityBlock: { marginBottom: 32 },
-  cityHeader: { display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "14px 20px", background: "#fff", borderRadius: 14, border: "1px solid #e8e4de" },
-  cityName: { fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: "#1a1a1a" },
-  cityCountry: { fontSize: 12, color: "#999" },
-  dayBlock: { marginBottom: 16, paddingLeft: 20, borderLeft: "2px solid #e8e4de" },
-  dayLabel: { fontSize: 13, fontWeight: 700, color: "#2d4a35", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 },
-  dayDate: { fontSize: 12, fontWeight: 500, color: "#888" },
-  activityCard: { display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 12, background: "#fff", border: "1px solid #f0ede8", marginBottom: 8 },
-  actTime: { fontSize: 12, fontWeight: 700, color: "#2d4a35", minWidth: 70, flexShrink: 0 },
-  actName: { fontSize: 14, fontWeight: 600, color: "#1a1a1a", flex: 1 },
-  actMeta: { display: "flex", alignItems: "center", gap: 12 },
-  actTag: { display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#999", background: "#f8f6f3", padding: "3px 8px", borderRadius: 6 },
-};
-
 export default function ItineraryViewPage() {
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   return (
-    <div>
-      <Link href="/dashboard" style={S.backLink}><ArrowLeft size={15} /> Back to Trip</Link>
-
-      <div style={S.header}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 40, fontFamily: "'Montserrat', sans-serif" }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={S.title}>Itinerary View</h1>
-          <p style={S.subtitle}>Review your complete day-wise travel plan.</p>
+          <Link href="./" style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            color: 'var(--text-muted)', fontSize: 13, fontWeight: 700,
+            textDecoration: 'none', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}>
+            <ArrowLeft size={16} /> Back to Trip
+          </Link>
+          <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>Itinerary View</h1>
+          <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Your journey, organized by day and destination.</p>
         </div>
-        <div style={S.toggleRow}>
-          <button style={S.toggleBtn(viewMode === "list")} onClick={() => setViewMode("list")}><List size={14} /> List</button>
-          <button style={S.toggleBtn(viewMode === "calendar")} onClick={() => setViewMode("calendar")}><CalendarDays size={14} /> Calendar</button>
+        <div className="glass-panel" style={{ padding: 6, borderRadius: 16, display: 'flex', gap: 4, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--outline-variant)' }}>
+          <button
+            onClick={() => setViewMode("list")}
+            style={{
+              padding: '10px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: viewMode === 'list' ? 'var(--primary)' : 'transparent',
+              color: viewMode === 'list' ? 'white' : 'var(--text-muted)',
+              fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.3s'
+            }}
+          >
+            <List size={16} /> List
+          </button>
+          <button
+            onClick={() => setViewMode("calendar")}
+            style={{
+              padding: '10px 20px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: viewMode === 'calendar' ? 'var(--primary)' : 'transparent',
+              color: viewMode === 'calendar' ? 'white' : 'var(--text-muted)',
+              fontWeight: 700, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.3s'
+            }}
+          >
+            <Calendar size={16} /> Calendar
+          </button>
         </div>
-      </div>
+      </header>
 
-      {ITINERARY.map((stop) => (
-        <div key={stop.city} style={S.cityBlock}>
-          <div style={S.cityHeader}>
-            <MapPin size={18} color="#2d4a35" />
-            <div>
-              <div style={S.cityName}>{stop.city}</div>
-              <div style={S.cityCountry}>{stop.country}</div>
-            </div>
-          </div>
-          {stop.days.map((day) => (
-            <div key={day.day} style={S.dayBlock}>
-              <div style={S.dayLabel}>
-                <Calendar size={14} /> {day.day} <span style={S.dayDate}>— {day.date}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
+        {ITINERARY.map((stop) => (
+          <section key={stop.city} style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <div style={{ 
+                width: 56, 
+                height: 56, 
+                borderRadius: 16, 
+                background: 'var(--primary-container)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                color: 'var(--primary)',
+                border: '1px solid rgba(26, 111, 205, 0.2)'
+              }}>
+                <MapPin size={24} />
               </div>
-              {day.activities.map((act, i) => (
-                <div key={i} style={S.activityCard}>
-                  <div style={S.actTime}>{act.time}</div>
-                  <div style={S.actName}>{act.name}</div>
-                  <div style={S.actMeta}>
-                    <span style={S.actTag}><Clock size={11} /> {act.duration}</span>
-                    <span style={S.actTag}><DollarSign size={11} /> {act.cost}</span>
+              <div>
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: 'white', letterSpacing: '-0.01em' }}>{stop.city}</h2>
+                <p style={{ fontSize: 12, color: 'var(--accent-light)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{stop.country}</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {stop.days.map((day) => (
+                <div key={day.day} className="glass-panel" style={{ padding: 32, borderRadius: 32, display: 'flex', gap: 40, border: '1px solid var(--outline-variant)' }}>
+                  <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid var(--outline-variant)', paddingRight: 40 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{day.day}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: 'white' }}>{day.date}</div>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {day.activities.map((act, i) => (
+                      <div key={i} className="booking-item" style={{ padding: '16px 24px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                        <div style={{ minWidth: 90, fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>{act.time}</div>
+                        <div style={{ flex: 1, fontSize: 16, fontWeight: 700, color: 'white' }}>{act.name}</div>
+                        <div style={{ display: 'flex', gap: 20 }}>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+                            <Clock size={14} opacity={0.6} /> {act.duration}
+                          </span>
+                          <span style={{ fontSize: 12, color: 'var(--accent-light)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <CreditCard size={14} opacity={0.6} /> {act.cost}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
             </div>
-          ))}
-        </div>
-      ))}
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
+

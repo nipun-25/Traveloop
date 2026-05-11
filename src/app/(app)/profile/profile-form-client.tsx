@@ -2,26 +2,17 @@
 
 import React, { useState } from 'react';
 import { updateProfile } from './actions';
-import { User, Mail, Globe, Camera, Save, MapPin } from 'lucide-react';
 import type { Profile } from '@/types';
-
-const S = {
-  page: { maxWidth: 700, margin: "0 auto" },
-  title: { fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 },
-  subtitle: { fontSize: 14, color: "#888", marginBottom: 32 },
-  card: { background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", padding: "28px", marginBottom: 20 },
-  sectionLabel: { fontSize: 10, fontWeight: 700, color: "#aaa", letterSpacing: "0.12em", textTransform: "uppercase" as const, marginBottom: 18, display: "flex", alignItems: "center", gap: 8 },
-  avatarSection: { display: "flex", alignItems: "center", gap: 20, marginBottom: 24 },
-  avatar: { width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg, #c5d4c5, #8cb89e)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 700, color: "#2d4a35", flexShrink: 0 },
-  fieldGroup: { marginBottom: 20 },
-  label: { display: "block", fontSize: 13, fontWeight: 600, color: "#444", marginBottom: 6 },
-  input: { width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid #e2ddd6", background: "#faf9f7", fontSize: 14, color: "#1a1a1a", outline: "none", fontFamily: "'Montserrat', sans-serif" },
-  select: { width: "100%", padding: "12px 16px", borderRadius: 12, border: "1px solid #e2ddd6", background: "#faf9f7", fontSize: 14, color: "#1a1a1a", outline: "none" },
-  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
-  saveBtn: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "14px 0", borderRadius: 9999, background: "#2d4a35", color: "#fff", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer" },
-  success: { background: "#dce8dc", border: "1px solid #8cb89e", color: "#2d4a35", borderRadius: 12, padding: "12px 16px", fontSize: 13, fontWeight: 500, marginBottom: 20 },
-  error: { background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c", borderRadius: 12, padding: "12px 16px", fontSize: 13, fontWeight: 500, marginBottom: 20 },
-};
+import { 
+  User, 
+  Mail, 
+  Languages, 
+  Save, 
+  CheckCircle, 
+  AlertCircle,
+  Loader2,
+  ChevronDown
+} from 'lucide-react';
 
 export default function ProfileFormClient({ profile }: { profile: Profile }) {
   const [name, setName] = useState(profile.name || "");
@@ -46,50 +37,167 @@ export default function ProfileFormClient({ profile }: { profile: Profile }) {
   const initials = name.split(" ").map(n => n[0]).join("").toUpperCase() || "?";
 
   return (
-    <div style={S.page}>
-      <h1 style={S.title}>Profile & Settings</h1>
-      <p style={S.subtitle}>Manage your account and preferences.</p>
+    <div style={{ maxWidth: 800, margin: "0 auto", display: 'flex', flexDirection: 'column', gap: 40, fontFamily: "'Montserrat', sans-serif" }}>
+      <header>
+        <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>Profile & Settings</h1>
+        <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Manage your account and travel preferences.</p>
+      </header>
 
-      {message && <div style={message.type === "success" ? S.success : S.error}>{message.text}</div>}
+      {message && (
+        <div style={{
+          padding: '16px 24px',
+          borderRadius: 16,
+          background: message.type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 180, 171, 0.1)',
+          border: `1px solid ${message.type === 'success' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 180, 171, 0.3)'}`,
+          color: message.type === 'success' ? '#10b981' : '#ffb4ab',
+          fontSize: 14,
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12
+        }}>
+          {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+          {message.text}
+        </div>
+      )}
 
-      <div style={S.card}>
-        <div style={S.sectionLabel}><User size={13} /> Personal Information</div>
-        <div style={S.avatarSection}>
-          <div style={S.avatar}>{initials}</div>
+      <div className="glass-panel" style={{ padding: 32, borderRadius: 32, display: 'flex', flexDirection: 'column', gap: 32, border: '1px solid var(--outline-variant)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+          <div style={{
+            width: 88, height: 88, borderRadius: 24,
+            background: 'var(--primary-container)',
+            color: 'var(--primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, fontWeight: 800,
+            border: '1px solid rgba(26, 111, 205, 0.2)'
+          }}>
+            {initials}
+          </div>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>{name || "Unnamed"}</div>
-            <div style={{ fontSize: 12, color: "#888" }}>{profile.email}</div>
+            <div style={{ fontSize: 24, fontWeight: 700, color: "white", marginBottom: 6, letterSpacing: '-0.01em' }}>{name || "Explorer"}</div>
+            <div style={{ fontSize: 14, color: "var(--text-muted)", fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Mail size={14} opacity={0.6} /> {profile.email}
+            </div>
           </div>
         </div>
-        <div style={S.row}>
-          <div style={S.fieldGroup}>
-            <label style={S.label}>Full Name</label>
-            <input style={S.input} value={name} onChange={e => setName(e.target.value)} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Full Name</label>
+            <div style={{ position: 'relative' }}>
+              <User size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', opacity: 0.6 }} />
+              <input
+                style={{
+                  width: "100%",
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid var(--outline-variant)",
+                  borderRadius: 16,
+                  padding: "16px 20px 16px 48px",
+                  color: "white",
+                  fontSize: 15,
+                  fontWeight: 500,
+                  outline: "none",
+                  transition: 'all 0.3s'
+                }}
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onFocus={e => e.currentTarget.style.borderColor = 'var(--primary)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'var(--outline-variant)'}
+              />
+            </div>
           </div>
-          <div style={S.fieldGroup}>
-            <label style={S.label}>Email Address</label>
-            <input style={S.input} value={profile.email} disabled />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Email Address</label>
+            <div style={{ position: 'relative' }}>
+              <Mail size={18} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', opacity: 0.3 }} />
+              <input
+                style={{
+                  width: "100%",
+                  background: "rgba(255,255,255,0.01)",
+                  border: "1px solid var(--outline-variant)",
+                  borderRadius: 16,
+                  padding: "16px 20px 16px 48px",
+                  color: "rgba(255,255,255,0.3)",
+                  fontSize: 15,
+                  fontWeight: 500,
+                  outline: "none"
+                }}
+                value={profile.email}
+                disabled
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={S.card}>
-        <div style={S.sectionLabel}><Globe size={13} /> Preferences</div>
-        <div style={S.fieldGroup}>
-          <label style={S.label}>Language</label>
-          <select style={S.select} value={lang} onChange={e => setLang(e.target.value)}>
-            <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="de">Deutsch</option>
-            <option value="ja">日本語</option>
-          </select>
+      <div className="glass-panel" style={{ padding: 32, borderRadius: 32, display: 'flex', flexDirection: 'column', gap: 28, border: '1px solid var(--outline-variant)' }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: 'white', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Languages size={20} color="var(--accent-light)" />
+          Travel Preferences
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Language</label>
+          <div style={{ position: 'relative' }}>
+            <select
+              style={{
+                width: "100%",
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid var(--outline-variant)",
+                borderRadius: 16,
+                padding: "16px 20px",
+                color: "white",
+                fontSize: 15,
+                fontWeight: 500,
+                outline: "none",
+                appearance: 'none',
+                cursor: 'pointer'
+              }}
+              value={lang}
+              onChange={e => setLang(e.target.value)}
+            >
+              <option value="en">English (US)</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="ja">日本語</option>
+            </select>
+            <ChevronDown size={18} style={{ position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
+          </div>
         </div>
       </div>
 
-      <button style={{ ...S.saveBtn, opacity: loading ? 0.7 : 1 }} onClick={handleSave} disabled={loading}>
-        <Save size={16} /> {loading ? "Saving…" : "Save Changes"}
+      <button
+        style={{
+          width: "100%",
+          padding: "20px",
+          background: "var(--primary)",
+          color: "white",
+          borderRadius: 20,
+          fontWeight: 800,
+          fontSize: 18,
+          border: "none",
+          cursor: loading ? "not-allowed" : "pointer",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 12,
+          opacity: loading ? 0.7 : 1,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: '0 10px 30px rgba(26, 111, 205, 0.2)'
+        }}
+        onClick={handleSave}
+        disabled={loading}
+      >
+        {loading ? <Loader2 size={22} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={22} />}
+        {loading ? "Updating Profile..." : "Save Profile Changes"}
       </button>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

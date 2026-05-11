@@ -1,13 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { getTrips } from './actions';
-import { Calendar, MapPin, Eye, Plus, Plane } from 'lucide-react';
-
-const statusColors: Record<string, { bg: string; text: string }> = {
-  "Upcoming": { bg: "#dce8dc", text: "#2d4a35" },
-  "In Progress": { bg: "#e3e0f5", text: "#5b4db5" },
-  "Completed": { bg: "#e8e4de", text: "#666" },
-};
+import { 
+  PlusCircle, 
+  Map, 
+  Calendar, 
+  ChevronRight, 
+  Image as ImageIcon,
+  Compass
+} from 'lucide-react';
 
 function getTripStatus(start: string, end: string) {
   const now = Date.now();
@@ -18,54 +19,96 @@ function getTripStatus(start: string, end: string) {
   return "Completed";
 }
 
+const statusClasses: Record<string, string> = {
+  "Upcoming": "pill-processing",
+  "In Progress": "pill-confirmed",
+  "Completed": "glass-panel",
+};
+
 export default async function MyTripsPage() {
   const trips = await getTrips();
-  const formatDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const formatDate = (d: string) => new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 40, fontFamily: "'Montserrat', sans-serif" }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>My Trips</h1>
-          <p style={{ fontSize: 14, color: "#888" }}>Access and manage all your travel plans.</p>
+          <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>My Trips</h1>
+          <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Explore your past and future journeys.</p>
         </div>
-        <Link href="/trips/create-trip" style={{ display: "flex", alignItems: "center", gap: 8, background: "#2d4a35", color: "#fff", borderRadius: 9999, padding: "12px 22px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-          <Plus size={16} /> New Trip
+        <Link
+          href="/trips/create-trip"
+          style={{
+            padding: "14px 28px",
+            background: "var(--primary)",
+            color: "white",
+            borderRadius: 16,
+            fontWeight: 700,
+            fontSize: 15,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: "0 10px 20px rgba(26, 111, 205, 0.2)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          <PlusCircle size={18} />
+          New Trip
         </Link>
-      </div>
+      </header>
 
       {trips.length === 0 ? (
-        <div style={{ background: "#fff", borderRadius: 20, border: "2px dashed #ddd8d0", padding: "60px 32px", textAlign: "center" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#f0ede8", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#aaa" }}><Plane size={24} /></div>
-          <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>No trips yet</div>
-          <div style={{ fontSize: 14, color: "#888", marginBottom: 24 }}>Start your journey by creating your first trip.</div>
-          <Link href="/trips/new" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#2d4a35", color: "#fff", borderRadius: 9999, padding: "12px 22px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
-            Create your first trip →
+        <section className="glass-panel" style={{ padding: "100px 40px", textAlign: 'center', borderRadius: 32, border: '1px dashed var(--outline)' }}>
+          <div style={{ color: 'var(--primary)', opacity: 0.3, marginBottom: 24 }}>
+            <Compass size={64} />
+          </div>
+          <h2 style={{ fontSize: 24, color: 'white', marginBottom: 12 }}>No trips found</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: 32, maxWidth: 400, marginInline: 'auto', fontWeight: 500 }}>
+            Your adventure hasn't started yet. Create your first itinerary to see it here.
+          </p>
+          <Link href="/trips/create-trip" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 16, textDecoration: 'none', background: 'var(--primary-container)', padding: '12px 24px', borderRadius: 12 }}>
+            Start Planning Now
           </Link>
-        </div>
+        </section>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {trips.map((trip) => {
             const status = getTripStatus(trip.start_date, trip.end_date);
-            const colors = statusColors[status] || statusColors["Completed"];
+            const statusClass = statusClasses[status] || "glass-panel";
+            
             return (
-              <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: "none" }}>
-                <div style={{ display: "flex", alignItems: "stretch", background: "#fff", borderRadius: 16, border: "1px solid #e8e4de", overflow: "hidden", transition: "box-shadow 0.2s, transform 0.2s", cursor: "pointer" }} className="trip-list-card">
-                  <div style={{ width: 180, minHeight: 140, background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover no-repeat` : "linear-gradient(135deg, #c8c8c8 0%, #e0ddd8 60%)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {!trip.cover_photo_url && <MapPin size={28} style={{ opacity: 0.2, color: "#fff" }} />}
-                  </div>
-                  <div style={{ flex: 1, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                      <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: "#1a1a1a" }}>{trip.name}</span>
-                      <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 9999, padding: "4px 12px", background: colors.bg, color: colors.text }}>{status}</span>
+              <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: 'none' }}>
+                <div className="booking-item glass-panel" style={{ padding: 24, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 32, flex: 1 }}>
+                    <div style={{
+                      width: 140, height: 140, borderRadius: 20,
+                      background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover` : 'var(--surface-container-high)',
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      overflow: 'hidden', border: '1px solid var(--outline-variant)'
+                    }}>
+                      {!trip.cover_photo_url && <Compass size={40} color="var(--primary)" opacity={0.2} />}
                     </div>
-                    <div style={{ fontSize: 13, color: "#888", marginBottom: 12, lineHeight: 1.5 }}>{trip.description || "No description"}</div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#999" }}><Calendar size={13} /> {formatDate(trip.start_date)} – {formatDate(trip.end_date)}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+                        <h3 style={{ fontSize: 22, fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>{trip.name}</h3>
+                        <span className={statusClass} style={{ fontSize: 10 }}>{status}</span>
+                      </div>
+                      <p style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: 500 }}>
+                        {trip.description || "Explore the wonders of the world and create unforgettable memories with every step of your journey."}
+                      </p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--gold)', fontSize: 13, fontWeight: 700 }}>
+                          <Calendar size={16} />
+                          {formatDate(trip.start_date)} – {formatDate(trip.end_date)}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", padding: "20px" }}>
-                    <span style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #e8e4de", display: "flex", alignItems: "center", justifyContent: "center", color: "#888" }}><Eye size={15} /></span>
+                  <div style={{ paddingLeft: 24 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', color: 'white', border: '1px solid var(--outline-variant)' }}>
+                      <ChevronRight size={20} />
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -73,7 +116,7 @@ export default async function MyTripsPage() {
           })}
         </div>
       )}
-      <style>{`.trip-list-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-2px); }`}</style>
     </div>
   );
 }
+
