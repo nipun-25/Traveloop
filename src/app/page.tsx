@@ -222,13 +222,17 @@ export default function LandingPage({ initialAuthType = null }: LandingPageProps
             >
               {DESTINATIONS[current].name}
             </motion.h1>
-            <p className="dest-desc">{DESTINATIONS[current].desc}</p>
-            <button className="explore-btn" onClick={() => user ? window.location.href = '/dashboard' : setAuthType('signup')}>
-              Explore
-              <span className="arrow-circle">
-                <ArrowRight size={16} />
-              </span>
-            </button>
+            {!authType && (
+              <>
+                <p className="dest-desc">{DESTINATIONS[current].desc}</p>
+                <button className="explore-btn" onClick={() => user ? window.location.href = '/dashboard' : setAuthType('signup')}>
+                  Explore
+                  <span className="arrow-circle">
+                    <ArrowRight size={16} />
+                  </span>
+                </button>
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

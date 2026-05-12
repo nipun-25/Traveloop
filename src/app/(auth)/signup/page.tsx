@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LandingPage from "@/app/page";
+import SignupForm from "./signup-form";
 
 export const metadata: Metadata = {
   title: "Sign Up",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SignupPage() {
-  return <LandingPage initialAuthType="signup" />;
+  return <SignupForm />;
 }

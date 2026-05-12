@@ -31,13 +31,14 @@ export default async function MyTripsPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 40, fontFamily: "'Montserrat', sans-serif" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <header className="trip-list-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h1 style={{ fontSize: 32, color: "white", marginBottom: 8, letterSpacing: "-0.02em" }}>My Trips</h1>
           <p style={{ fontSize: 15, color: "var(--text-muted)", fontWeight: 500 }}>Explore your past and future journeys.</p>
         </div>
         <Link
           href="/trips/create-trip"
+          className="new-trip-btn"
           style={{
             padding: "14px 28px",
             background: "var(--primary)",
@@ -72,16 +73,15 @@ export default async function MyTripsPage() {
           </Link>
         </section>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="trips-container" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {trips.map((trip) => {
             const status = getTripStatus(trip.start_date, trip.end_date);
             const statusClass = statusClasses[status] || "glass-panel";
             
             return (
               <Link key={trip.id} href={`/trips/${trip.id}`} style={{ textDecoration: 'none' }}>
-                <div className="booking-item glass-panel" style={{ padding: 24, borderRadius: 24, border: '1px solid var(--outline-variant)' }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 32, flex: 1 }}>
-                    <div style={{
+                <div className="booking-item glass-panel trip-card-row" style={{ padding: 24, borderRadius: 24, border: '1px solid var(--outline-variant)', display: "flex", alignItems: "center", gap: 32 }}>
+                    <div className="trip-card-image" style={{
                       width: 140, height: 140, borderRadius: 20,
                       background: trip.cover_photo_url ? `url(${trip.cover_photo_url}) center/cover` : 'var(--surface-container-high)',
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -94,7 +94,7 @@ export default async function MyTripsPage() {
                         <h3 style={{ fontSize: 22, fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>{trip.name}</h3>
                         <span className={statusClass} style={{ fontSize: 10 }}>{status}</span>
                       </div>
-                      <p style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: 500 }}>
+                      <p className="trip-card-desc" style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 16, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontWeight: 500 }}>
                         {trip.description || "Explore the wonders of the world and create unforgettable memories with every step of your journey."}
                       </p>
                       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -104,8 +104,7 @@ export default async function MyTripsPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div style={{ paddingLeft: 24 }}>
+                  <div className="trip-card-chevron" style={{ paddingLeft: 24 }}>
                     <div style={{ width: 48, height: 48, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', color: 'white', border: '1px solid var(--outline-variant)' }}>
                       <ChevronRight size={20} />
                     </div>

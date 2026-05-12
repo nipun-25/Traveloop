@@ -22,6 +22,8 @@ export default function NewTripPage() {
   const [loading, setLoading] = useState(false);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -168,11 +170,21 @@ export default function NewTripPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 24 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Start Date</label>
-              <GlassDatePicker name="start_date" required />
+              <GlassDatePicker 
+                name="start_date" 
+                required 
+                onChange={(date) => setStartDate(date)}
+                minDate={new Date()}
+              />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <label style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>End Date</label>
-              <GlassDatePicker name="end_date" required />
+              <GlassDatePicker 
+                name="end_date" 
+                required 
+                onChange={(date) => setEndDate(date)}
+                minDate={startDate ? new Date(startDate) : new Date()}
+              />
             </div>
           </div>
         </div>

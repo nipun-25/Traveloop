@@ -13,7 +13,7 @@ export default function AuthLayout({
       <div className="absolute inset-0 z-[1] bg-gradient-to-br from-[#050a19] via-[#050a19]/80 to-transparent" />
       
       <div className="relative z-10 w-full max-w-md">
-        <div className="flex flex-col items-center mb-10">
+        <div className="hidden sm:flex flex-col items-center mb-10">
           <div className="w-12 h-12 bg-gradient-to-br from-[#f5a623] to-[#e8621a] rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 mb-4">
             <span className="text-2xl font-bold text-white">T</span>
           </div>

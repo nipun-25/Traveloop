@@ -108,21 +108,39 @@ export async function getTrips(): Promise<Trip[]> {
  * Get a single trip by ID
  */
 export async function getTripById(id: string): Promise<Trip | null> {
-  const supabase = await createClient();
+  console.log(`[getTripById] Fetching trip with ID: ${id}`);
+  
+  try {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("trips")
-    .select("*")
-    .eq("id", id)
-    .is("deleted_at", null)
-    .single();
+    const { data, error } = await supabase
+      .from("trips")
+      .select("*")
+      .eq("id", id)
+      .is("deleted_at", null)
+      .single();
 
-  if (error) {
-    console.error("Error fetching trip:", error);
-    return null;
+    if (error) {
+      console.error(`[getTripById] Supabase error for ID ${id}:`, {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      return null;
+    }
+
+    if (!data) {
+      console.warn(`[getTripById] No trip found for ID: ${id}`);
+      return null;
+    }
+
+    console.log(`[getTripById] Successfully fetched trip: "${data.name}" (ID: ${data.id})`);
+    return data;
+  } catch (err) {
+    console.error(`[getTripById] Unexpected error fetching trip ${id}:`, err);
+    throw err; // Re-throw to be caught by error.tsx
   }
-
-  return data;
 }
 
 /**

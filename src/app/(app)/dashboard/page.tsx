@@ -36,7 +36,7 @@ export default async function DashboardPage() {
           justifyContent: "space-between",
           alignItems: "center",
           borderRadius: 32,
-          padding: 40,
+          padding: "clamp(24px, 5vw, 40px)",
           background: "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))",
           border: "1px solid var(--outline-variant)",
           flexWrap: "wrap",
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div
-            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 32 }}
+            style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))", gap: 32 }}
           >
             {upcomingTrips.map((trip) => (
               <Link key={trip.id} href={`/trips/${trip.id}`} className="dest-card" style={{ textDecoration: 'none' }}>
@@ -117,10 +117,10 @@ export default async function DashboardPage() {
 
       {/* Stats & Actions */}
       <div
-        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 32, paddingBottom: 64 }}
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 32, paddingBottom: 64 }}
       >
         {/* Stats */}
-        <div className="glass-panel" style={{ borderRadius: 32, padding: 32, border: '1px solid var(--outline-variant)' }}>
+        <div className="glass-panel" style={{ borderRadius: 32, padding: "clamp(24px, 5vw, 32px)", border: '1px solid var(--outline-variant)' }}>
           <h3 style={{ fontSize: 20, color: "white", marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
             <Briefcase size={20} color="var(--primary)" />
             Travel Stats
@@ -142,7 +142,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="glass-panel" style={{ borderRadius: 32, padding: 32, border: '1px solid var(--outline-variant)' }}>
+        <div className="glass-panel" style={{ borderRadius: 32, padding: "clamp(24px, 5vw, 32px)", border: '1px solid var(--outline-variant)' }}>
           <h3 style={{ fontSize: 20, color: "white", marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
             <Compass size={20} color="var(--secondary)" />
             Quick Actions

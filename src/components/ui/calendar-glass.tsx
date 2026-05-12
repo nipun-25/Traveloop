@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addDays, subDays } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addDays, subDays, startOfDay, endOfDay } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,9 +11,11 @@ interface GlassDatePickerProps {
   defaultValue?: string;
   onChange?: (date: string) => void;
   label?: string;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
-export default function GlassDatePicker({ name, required, defaultValue, onChange, label }: GlassDatePickerProps) {
+export default function GlassDatePicker({ name, required, defaultValue, onChange, label, minDate, maxDate }: GlassDatePickerProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(defaultValue ? new Date(defaultValue) : null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +33,10 @@ export default function GlassDatePicker({ name, required, defaultValue, onChange
   }, []);
 
   const onDateClick = (day: Date) => {
+    // Check if date is disabled
+    if (minDate && day < startOfDay(minDate)) return;
+    if (maxDate && day > endOfDay(maxDate)) return;
+
     setSelectedDate(day);
     setIsOpen(false);
     if (onChange) {
@@ -82,43 +88,48 @@ export default function GlassDatePicker({ name, required, defaultValue, onChange
     let day = startDate;
     let formattedDate = "";
 
-    while (day <= endDate) {
-      for (let i = 0; i < 7; i++) {
-        formattedDate = format(day, dateFormat);
-        const cloneDay = day;
-        const isSelected = selectedDate && isSameDay(day, selectedDate);
-        const isCurrentMonth = isSameMonth(day, monthStart);
+        while (day <= endDate) {
+            for (let i = 0; i < 7; i++) {
+                formattedDate = format(day, dateFormat);
+                const cloneDay = day;
+                const isSelected = selectedDate && isSameDay(day, selectedDate);
+                const isCurrentMonth = isSameMonth(day, monthStart);
 
-        days.push(
-          <div
-            key={day.toString()}
-            onClick={() => onDateClick(cloneDay)}
-            style={{
-              height: 40,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: 10,
-              fontSize: 14,
-              fontWeight: 600,
-              color: isSelected ? 'white' : isCurrentMonth ? 'white' : 'rgba(255,255,255,0.2)',
-              background: isSelected ? 'var(--primary)' : 'transparent',
-              transition: 'all 0.2s',
-              margin: 2
-            }}
-            onMouseOver={(e) => {
-              if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-            }}
-            onMouseOut={(e) => {
-              if (!isSelected) e.currentTarget.style.background = 'transparent';
-            }}
-          >
-            <span>{formattedDate}</span>
-          </div>
-        );
-        day = addDays(day, 1);
-      }
+                // Check if date is disabled
+                const isDisabled = (minDate && startOfDay(day) < startOfDay(minDate)) ||
+                    (maxDate && startOfDay(day) > startOfDay(maxDate));
+
+                days.push(
+                    <div
+                        key={day.toString()}
+                        onClick={() => !isDisabled && onDateClick(cloneDay)}
+                        style={{
+                            height: 40,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: isDisabled ? 'not-allowed' : 'pointer',
+                            borderRadius: 10,
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: isSelected ? 'white' : isDisabled ? 'rgba(255,255,255,0.05)' : isCurrentMonth ? 'white' : 'rgba(255,255,255,0.2)',
+                            background: isSelected ? 'var(--primary)' : 'transparent',
+                            transition: 'all 0.2s',
+                            margin: 2,
+                            opacity: isDisabled ? 0.5 : 1
+                        }}
+                        onMouseOver={(e) => {
+                            if (!isSelected && !isDisabled) e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                        }}
+                        onMouseOut={(e) => {
+                            if (!isSelected && !isDisabled) e.currentTarget.style.background = 'transparent';
+                        }}
+                    >
+                        <span>{formattedDate}</span>
+                    </div>
+                );
+                day = addDays(day, 1);
+            }
       rows.push(
         <div key={day.toString()} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
           {days}

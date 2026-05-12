@@ -4,19 +4,22 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import LogoutButton from './_components/logout-button';
+import NotificationCenter from './_components/notification-center';
 import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  Map, 
-  User, 
-  BarChart3, 
-  PlusCircle, 
+import {
+  LayoutDashboard,
+  Map,
+  User,
+  BarChart3,
+  PlusCircle,
   HelpCircle,
   Search,
   Bell,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
+import { logout } from '@/app/(auth)/actions';
 
 const NAV = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -26,13 +29,11 @@ const NAV = [
 ];
 
 const BG_IMAGES = [
-  'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=80', // Mountains
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80', // Beach
-  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=80', // Greenery
-  'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1600&q=80', // City
-  'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80', // General Travel
-  'https://images.unsplash.com/photo-1506929111453-61699971032b?w=1600&q=80', // Coast
-  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600&q=80', // Night Mountains
+  'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1080&q=80', // Mountains
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1080&q=80', // Beach
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1080&q=80', // Nature
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1080&q=80', // Forest
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1080&q=80', // Lake
 ];
 
 export default function AppLayout({
@@ -42,12 +43,24 @@ export default function AppLayout({
 }) {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(false);
   const [userName, setUserName] = useState('Traveler');
   const [userInitials, setUserInitials] = useState('T');
   const [searchVal, setSearchVal] = useState("");
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [bgIndex, setBgIndex] = useState(0);
   const supabase = createClient();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Background Cycling Logic - Matched to Landing Page (8s)
   useEffect(() => {
@@ -56,6 +69,23 @@ export default function AppLayout({
     }, 8000);
     return () => clearInterval(interval);
   }, []);
+  
+  // Check for notifications for the unread dot
+  useEffect(() => {
+    const checkNotifications = () => {
+      const saved = localStorage.getItem('traveloop_notifications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setHasNotifications(parsed.length > 0);
+      } else {
+        setHasNotifications(true); // Default mock has 3
+      }
+    };
+    checkNotifications();
+    // Refresh check when panel opens/closes
+    const interval = setInterval(checkNotifications, 2000);
+    return () => clearInterval(interval);
+  }, [isNotificationsOpen]);
 
   useEffect(() => {
     async function checkUser() {
@@ -90,24 +120,29 @@ export default function AppLayout({
     <div style={{ display: "flex", minHeight: "100vh", background: "transparent", fontFamily: "'Montserrat', sans-serif", color: "white" }}>
       {/* Cinematic Background Layer */}
       <div className="app-bg-container">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.img
             key={currentBg}
             src={currentBg}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
+            transition={{ duration: 2, ease: "easeInOut" }}
             className="app-bg-image"
-            alt="background"
-            style={{ filter: 'brightness(1.1)' }}
+            alt=""
+            style={{ 
+              filter: 'brightness(1.1)',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
           />
         </AnimatePresence>
         <div className="app-bg-overlay" style={{ background: "radial-gradient(circle at center, rgba(5,10,25,0.05), rgba(5,10,25,0.25))" }} />
       </div>
 
       {/* Sidebar Trigger Area */}
-      <div 
+      <div
         onMouseEnter={() => setIsSidebarExpanded(true)}
         style={{ position: 'fixed', left: 0, top: 0, bottom: 0, width: 20, zIndex: 60 }}
       />
@@ -136,18 +171,18 @@ export default function AppLayout({
         }}
       >
         {/* Identity Section */}
-        <div style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          gap: 16, 
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
           marginBottom: 48,
           width: "100%",
           paddingLeft: 4 // Ensures logo centers well when collapsed
         }}>
-          <div style={{ 
-            width: 44, 
-            height: 44, 
-            background: "linear-gradient(135deg, var(--primary), var(--tertiary))", 
+          <div style={{
+            width: 44,
+            height: 44,
+            background: "linear-gradient(135deg, var(--primary), var(--tertiary))",
             borderRadius: 14,
             display: "grid",
             placeItems: "center",
@@ -161,7 +196,7 @@ export default function AppLayout({
           </div>
           <AnimatePresence>
             {isSidebarExpanded && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
@@ -196,7 +231,7 @@ export default function AppLayout({
               >
                 <NavIcon size={20} strokeWidth={active ? 2.5 : 2} style={{ flexShrink: 0 }} />
                 {isSidebarExpanded && (
-                  <motion.span 
+                  <motion.span
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     style={{ fontWeight: active ? 700 : 500, whiteSpace: "nowrap" }}
@@ -252,15 +287,17 @@ export default function AppLayout({
         </div>
       </motion.nav>
 
+
       {/* Main */}
-      <motion.main 
+      <motion.main
         initial={false}
-        animate={{ marginLeft: isSidebarExpanded ? 280 : 88 }}
+        animate={{ marginLeft: isMobile ? 0 : (isSidebarExpanded ? 280 : 88) }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="main-content"
         style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", zIndex: 10 }}
       >
         {/* Fragmented Top Bar */}
-        <header style={{
+        <header className="app-header" style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -268,15 +305,13 @@ export default function AppLayout({
           background: "transparent",
           position: "sticky",
           top: 0,
-          zIndex: 50,
-          pointerEvents: 'none'
+          zIndex: 50
         }}>
           {/* Search Box */}
-          <div style={{ 
-            position: "relative", 
-            width: "40%", 
-            maxWidth: 440,
-            pointerEvents: 'auto'
+          <div style={{
+            position: "relative",
+            width: "40%",
+            maxWidth: 440
           }}>
             <Search
               size={18}
@@ -291,7 +326,7 @@ export default function AppLayout({
             />
             <input
               type="text"
-              placeholder="Search destinations, bookings..."
+              placeholder="Search destinations..."
               value={searchVal}
               onChange={e => setSearchVal(e.target.value)}
               style={{
@@ -314,32 +349,113 @@ export default function AppLayout({
             />
           </div>
 
-          {/* Notification Button */}
-          <div style={{ pointerEvents: 'auto' }}>
-            <button style={{ 
-              background: "rgba(255, 255, 255, 0.08)", 
-              backdropFilter: "blur(40px)",
-              border: "1px solid rgba(255, 255, 255, 0.15)", 
-              width: 44, 
-              height: 44, 
-              borderRadius: 14, 
-              color: "white", 
-              cursor: "pointer",
-              display: "grid",
-              placeItems: "center",
-              transition: "all 0.3s",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
-            }}>
-              <Bell size={20} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button 
+              onClick={() => setIsNotificationsOpen(true)}
+              style={{
+                background: "rgba(255, 255, 255, 0.08)",
+                backdropFilter: "blur(40px)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                width: 44,
+                height: 44,
+                borderRadius: 14,
+                color: "white",
+                cursor: "pointer",
+                display: "grid",
+                placeItems: "center",
+                transition: "all 0.3s",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.2)"
+              }}
+            >
+              <div style={{ position: 'relative', display: 'grid', placeItems: 'center' }}>
+                <Bell size={20} />
+                {hasNotifications && (
+                  <span style={{
+                    position: 'absolute',
+                    top: -2,
+                    right: -2,
+                    width: 8,
+                    height: 8,
+                    background: '#ff4b4b',
+                    borderRadius: '50%',
+                    border: '2px solid #0a0f1e',
+                    boxShadow: '0 0 10px rgba(255, 75, 75, 0.5)'
+                  }} />
+                )}
+              </div>
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <div style={{ padding: "48px 60px", flex: 1 }}>
+        <div style={{ padding: isMobile ? "24px 20px" : "48px 60px", flex: 1, width: "100%", boxSizing: "border-box" }}>
           {children}
         </div>
       </motion.main>
+
+      {/* Mobile Bottom Navigation - Centered Plan Button and Equal Spacing */}
+      <nav className="mobile-nav" style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 80,
+        background: 'rgba(5, 10, 25, 0.45)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        display: 'none',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        padding: '0',
+        zIndex: 2000,
+      }}>
+        <Link href="/dashboard" style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          color: pathname === "/dashboard" ? 'var(--primary)' : 'rgba(255, 255, 255, 0.6)',
+          textDecoration: 'none', transition: 'all 0.3s'
+        }}>
+          <LayoutDashboard size={24} strokeWidth={pathname === "/dashboard" ? 2.5 : 2} />
+          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dashboard</span>
+        </Link>
+        <Link href="/trips" style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          color: pathname === "/trips" ? 'var(--primary)' : 'rgba(255, 255, 255, 0.6)',
+          textDecoration: 'none', transition: 'all 0.3s'
+        }}>
+          <Map size={24} strokeWidth={pathname === "/trips" ? 2.5 : 2} />
+          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Explore</span>
+        </Link>
+        <Link href="/trips/create-trip" style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          color: pathname === "/trips/create-trip" ? 'var(--primary)' : 'rgba(255, 255, 255, 0.6)',
+          textDecoration: 'none', transition: 'all 0.3s'
+        }}>
+          <PlusCircle size={24} strokeWidth={pathname === "/trips/create-trip" ? 2.5 : 2} />
+          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Plan</span>
+        </Link>
+        <Link href="/profile" style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          color: pathname === "/profile" ? 'var(--primary)' : 'rgba(255, 255, 255, 0.6)',
+          textDecoration: 'none', transition: 'all 0.3s'
+        }}>
+          <User size={24} strokeWidth={pathname === "/profile" ? 2.5 : 2} />
+          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Profile</span>
+        </Link>
+        <button onClick={() => logout()} style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+          color: 'rgba(255, 255, 255, 0.6)',
+          textDecoration: 'none', transition: 'all 0.3s',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0
+        }}>
+          <LogOut size={24} strokeWidth={2} />
+          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Logout</span>
+        </button>
+      </nav>
+
+      <NotificationCenter 
+        isOpen={isNotificationsOpen} 
+        onClose={() => setIsNotificationsOpen(false)} 
+      />
     </div>
   );
 }

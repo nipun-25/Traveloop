@@ -57,15 +57,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.5rem; }
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
 
 .hero {
   position: relative;
@@ -702,50 +715,44 @@ nav {
 }
 
 @media (max-width: 768px) {
-  nav {
-    padding: 20px 16px;
+  .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 16px 20px !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    z-index: 1000 !important;
   }
 
+  .app-header > div:first-child {
+    width: 45% !important;
+  }
+  
   .nav-links {
     display: none;
   }
-
-  .nav-right {
-    gap: 10px;
+  
+  .app-header {
+    display: flex !important; /* Ensure it's visible */
   }
 
-  .user-badge {
-    padding: 4px 12px 4px 4px;
-    gap: 6px;
-  }
-
-  .user-name-text {
-    max-width: 80px;
-    font-size: 0.7rem;
-  }
-
-  .user-avatar-sm {
-    width: 26px;
-    height: 26px;
-    font-size: 0.6rem;
-  }
-
-  .dashboard-link span {
-    display: none;
-  }
-
-  .dashboard-link {
-    padding: 8px 12px;
-  }
-
-  .side-dots {
-    display: none;
+  /* Landing Page Nav reverted to original absolute top */
+  nav:not(.mobile-nav) {
+    position: absolute !important;
+    top: 0 !important;
+    bottom: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border-top: none !important;
   }
 
   .content-wrapper {
     left: 20px;
     right: 20px;
-    bottom: 25%;
+    top: 15%;
+    bottom: auto;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -753,17 +760,18 @@ nav {
   }
 
   .dest-name {
-    font-size: 3rem;
-    margin-bottom: 16px;
+    font-size: 2.8rem;
+    margin-bottom: 12px;
     white-space: normal;
     text-align: center;
     width: auto;
   }
 
   .dest-desc {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     max-width: 100%;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    line-height: 1.5;
   }
 
   .explore-btn {
@@ -778,33 +786,90 @@ nav {
     right: 0;
     transform: none;
     padding: 20px;
-    min-width: unset;
+    min-width: 0;
     width: 100%;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
-    z-index: 150;
+    z-index: 2500;
   }
 
   .login-container {
     width: 100%;
+    box-sizing: border-box;
     padding: 32px 24px;
-    border-radius: 24px 24px 0 0;
+    border-radius: 32px;
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  .bottom-bar {
-    padding: 24px 20px;
+  .sidebar {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 90px !important;
+  }
+
+  .mobile-nav {
+    display: flex !important;
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 2000 !important;
+  }
+
+  .page-container {
+    padding: 24px 20px !important;
+  }
+  
+  .mobile-logout-only {
+    display: block !important;
+  }
+
+  /* Trips Page Specific Responsive Fixes */
+  .trip-list-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px;
+  }
+  
+  .trip-list-header .new-trip-btn {
+    width: 100%;
     justify-content: center;
   }
 
-  .nav-controls {
-    gap: 20px;
+  .trip-card-row {
+    gap: 16px !important;
+    padding: 16px !important;
+    flex-wrap: wrap;
   }
 
-  .nav-arrow {
-    width: 40px;
-    height: 40px;
+  .trip-card-image {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 12px !important;
   }
+
+  .trip-card-desc {
+    display: none !important; /* Hide description on mobile to save vertical space and prevent scrolling */
+  }
+
+  .trip-card-chevron {
+    display: none !important; /* Hide chevron to save horizontal space */
+  }
+
+  .trips-container {
+    gap: 12px !important;
+  }
+}
+
+.mobile-logout-only {
+  display: none;
 }
 
 @media (max-width: 480px) {
@@ -827,179 +892,215 @@ nav {
   }
 
   .content-wrapper {
-    bottom: 30%;
+    top: 15%;
+    bottom: auto;
   }
 }
 
 /* New UI Utilities */
 .app-bg-container {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background-color: #050a19;
 }
 
 .app-bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.7) contrast(1.1);
-    transform: scale(1.05);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7) contrast(1.1);
+  transform: scale(1.05);
 }
 
 .app-bg-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(5, 10, 25, 0.2) 0%, rgba(5, 10, 25, 0.6) 100%);
-    backdrop-filter: blur(2px);
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(5, 10, 25, 0.2) 0%, rgba(5, 10, 25, 0.6) 100%);
+  backdrop-filter: blur(2px);
 }
 
 .glass-panel {
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.text-shadow { text-shadow: 0 4px 16px rgba(0,0,0,0.6); }
+.nav-card-hover:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.text-shadow {
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
 
 .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
 }
 
 .nav-link.active {
-    background: var(--primary-container);
-    color: var(--on-primary-container);
-    box-shadow: inset 0 0 0 1px rgba(26, 111, 205, 0.1);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  box-shadow: inset 0 0 0 1px rgba(26, 111, 205, 0.1);
 }
 
 .nav-link.inactive {
-    color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .nav-link.inactive:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
 }
 
 .dest-card {
-    position: relative;
-    height: 384px;
-    border-radius: 24px;
-    overflow: hidden;
-    cursor: pointer;
-    background: var(--surface-container);
-    border: 1px solid var(--outline-variant);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  height: 384px;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dest-card img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dest-card:hover img { transform: scale(1.1); }
+.dest-card:hover img {
+  transform: scale(1.1);
+}
 
 .dest-card .overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(5, 10, 25, 0.9), transparent 70%);
-    opacity: 0.8;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5, 10, 25, 0.9), transparent 70%);
+  opacity: 0.8;
 }
 
 .dest-card .bookmark-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all 0.3s;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(5, 10, 25, 0.5);
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    color: white;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(5, 10, 25, 0.5);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  color: white;
 }
 
-.dest-card:hover .bookmark-btn { opacity: 1; transform: translateY(0); }
+.dest-card:hover .bookmark-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .dest-card .card-info {
-    position: absolute;
-    bottom: 24px;
-    left: 24px;
-    right: 24px;
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
 }
 
 .booking-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--outline-variant);
-    background: rgba(255, 255, 255, 0.03);
-    transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--outline-variant);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s;
 }
 
 .booking-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--outline);
-    transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--outline);
+  transform: translateY(-2px);
 }
 
 .pill-confirmed {
-    padding: 6px 14px;
-    border-radius: 9999px;
-    background: rgba(26, 111, 205, 0.15);
-    color: #3b8ff0;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    border: 1px solid rgba(26, 111, 205, 0.3);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(26, 111, 205, 0.15);
+  color: #3b8ff0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid rgba(26, 111, 205, 0.3);
 }
 
 .pill-processing {
-    padding: 6px 14px;
-    border-radius: 9999px;
-    background: rgba(245, 166, 35, 0.15);
-    color: var(--gold);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    border: 1px solid rgba(245, 166, 35, 0.3);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid rgba(245, 166, 35, 0.3);
 }
 
 .budget-card {
-    padding: 24px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--outline-variant);
-    display: flex;
-    flex-direction: column;
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--outline-variant);
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

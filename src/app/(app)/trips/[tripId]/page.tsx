@@ -116,19 +116,12 @@ export default async function TripDetailPage({ params }: { params: Promise<{ tri
           const CardIcon = card.icon;
           return (
             <Link key={card.title} href={`/trips/${tripId}/${card.href}`} style={{ textDecoration: 'none' }}>
-              <div className="glass-panel" style={{
+              <div className="glass-panel nav-card-hover" style={{
                 padding: 32,
                 borderRadius: 24,
                 height: '100%',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 border: '1px solid var(--outline-variant)',
                 background: 'rgba(255,255,255,0.02)'
-              }} onMouseOver={e => {
-                e.currentTarget.style.transform = 'translateY(-8px)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-              }} onMouseOut={e => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
               }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: 16,
